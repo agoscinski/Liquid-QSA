@@ -8,7 +8,7 @@ Requirement:
 
 Implemented are:
 * Grover Search  https://arxiv.org/abs/quant-ph/9605043
-* Yuri Ozhigov (only for two functions) http://www.complex-systems.com/abstracts/v11_i06_a03.html
+* Ozhigov Search (only for two functions) http://www.complex-systems.com/abstracts/v11_i06_a03.html
 
 Some examples of gates which can be printed can be seen in the example folder. If you want to use parts of it as library or execute code, have a look at the	SearchAlgorithmsSamples.fsx file, to see how it is done.
 
