@@ -1,0 +1,43 @@
+\input{/Liquid/LiquidTikZ}
+% \usepackage[landscape]{geometry}
+\begin{document}
+\title{LiquidTikZ sample}
+\author{Liquid v1}
+
+\begin{figure*}
+\def\Scale{1.00}
+\begin{tikzpicture}[scale=\Scale,every node/.style={scale=\Scale}]
+\matrix[matStyle] {
+  \point[0-0] &  &  & \mg[0-3]{USF_0_2} &  & \mg[0-5]{USF_0_2} &  &  &  &  &  & \point[0-11]  \\
+  \point[1-0] &  & \targ[1-2] &  &  &  & \targ[1-6] &  &  &  &  & \point[1-11]  \\
+  \point[2-0] &  & \targ[2-2] & \mg[2-3]{USF_0_2} & \ctrl[2-4] & \mg[2-5]{USF_0_2} & \targ[2-6] &  &  &  &  & \point[2-11]  \\
+  \point[3-0] &  &  & \mg[3-3]{USF_1_4} &  & \mg[3-5]{USF_1_4} &  &  &  &  &  & \point[3-11]  \\
+  \point[4-0] & \gate[4-1]{H} & \ctrl[4-2] &  &  &  & \ctrl[4-6] & \gate[4-7]{H} & \mg[4-8]{FP0} & \gate[4-9]{H} & \meter[4-10] & \point[4-11]  \\
+  \point[5-0] & \gate[5-1]{H} & \ctrl[5-2] &  &  &  & \ctrl[5-6] & \gate[5-7]{H} & \mg[5-8]{FP0} & \gate[5-9]{H} & \meter[5-10] & \point[5-11]  \\
+  \point[6-0] & \gate[6-1]{H} &  &  &  &  & \gate[6-6]{H} & \mg[6-7]{FP0} & \gate[6-8]{H} & \meter[6-9] &  & \point[6-11]  \\
+  \point[7-0] & \gate[7-1]{H} &  & \mg[7-3]{USF_1_4} & \ctrl[7-4] & \mg[7-5]{USF_1_4} & \gate[7-6]{H} & \mg[7-7]{FP0} & \gate[7-8]{H} & \meter[7-9] &  & \point[7-11]  \\
+  \point[8-0] & \gate[8-1]{X} & \gate[8-2]{H} &  & \targ[8-4] &  &  &  &  &  &  & \point[8-11]  \\
+  \point[9-0] & \gate[9-1]{X} & \gate[9-2]{H} &  & \targ[9-4] &  &  &  &  &  &  & \point[9-11]  \\
+   &  &  &  &  &  &  &  &  &  &  &   \\
+};
+% multigates go here
+\multigate{0-3}{2-3}{USF_0_2}
+\multigate{0-5}{2-5}{USF_0_2}
+\multigate{3-3}{7-3}{USF_1_4}
+\multigate{3-5}{7-5}{USF_1_4}
+\multigate{4-8}{5-8}{FP0}
+\multigate{6-7}{7-7}{FP0}
+% annotations go here
+% wires go here
+\begin{pgfonlayer}{background}
+\qw{0-0}{0-11} \qw{1-0}{1-11} \qw{2-0}{2-11} \qw{3-0}{3-11} \qw{4-0}{4-10} \qw{5-0}{5-10} 
+\qw{6-0}{6-9} \qw{7-0}{7-9} \qw{8-0}{8-11} \qw{9-0}{9-11} \cw{4-10}{4-11} \cw{5-10}{5-11} 
+\cw{6-9}{6-11} \cw{7-9}{7-11} 
+\qwx{2-4}{8-4} \qwxB{7-4}{9-4} \qwx{1-2}{4-2} \qwxB{2-2}{5-2} \qwx{1-6}{4-6} \qwxB{2-6}{5-6} 
+
+\end{pgfonlayer}
+\end{tikzpicture}
+\caption{\label{fig:OzhigovSearch} OzhigovSearch}
+\end{figure*}
+
+\end{document}

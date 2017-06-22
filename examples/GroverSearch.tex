@@ -1,0 +1,37 @@
+\input{/Liquid/LiquidTikZ}
+% \usepackage[landscape]{geometry}
+\begin{document}
+\title{LiquidTikZ sample}
+\author{Liquid v1}
+
+\begin{figure*}
+\def\Scale{1.00}
+\begin{tikzpicture}[scale=\Scale,every node/.style={scale=\Scale}]
+\matrix[matStyle] {
+  \point[0-0] &  &  & \mg[0-3]{USF_0_4} &  & \mg[0-5]{USF_0_4} &  &  &  & \mg[0-9]{USF_0_4} &  & \mg[0-11]{USF_0_4} &  &  &  &  & \point[0-16]  \\
+  \point[1-0] & \gate[1-1]{H} &  &  &  &  & \gate[1-6]{H} & \mg[1-7]{FP0} & \gate[1-8]{H} &  &  &  & \gate[1-12]{H} & \mg[1-13]{FP0} & \gate[1-14]{H} & \meter[1-15] & \point[1-16]  \\
+  \point[2-0] & \gate[2-1]{H} &  &  &  &  & \gate[2-6]{H} &  & \gate[2-8]{H} &  &  &  & \gate[2-12]{H} &  & \gate[2-14]{H} & \meter[2-15] & \point[2-16]  \\
+  \point[3-0] & \gate[3-1]{H} &  &  &  &  & \gate[3-6]{H} &  & \gate[3-8]{H} &  &  &  & \gate[3-12]{H} &  & \gate[3-14]{H} & \meter[3-15] & \point[3-16]  \\
+  \point[4-0] & \gate[4-1]{H} &  & \mg[4-3]{USF_0_4} & \ctrl[4-4] & \mg[4-5]{USF_0_4} & \gate[4-6]{H} & \mg[4-7]{FP0} & \gate[4-8]{H} & \mg[4-9]{USF_0_4} & \ctrl[4-10] & \mg[4-11]{USF_0_4} & \gate[4-12]{H} & \mg[4-13]{FP0} & \gate[4-14]{H} & \meter[4-15] & \point[4-16]  \\
+  \point[5-0] & \gate[5-1]{X} & \gate[5-2]{H} &  & \targ[5-4] &  &  &  &  &  & \targ[5-10] &  &  &  &  &  & \point[5-16]  \\
+   &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &   \\
+};
+% multigates go here
+\multigate{0-3}{4-3}{USF_0_4}
+\multigate{0-5}{4-5}{USF_0_4}
+\multigate{0-9}{4-9}{USF_0_4}
+\multigate{0-11}{4-11}{USF_0_4}
+\multigate{1-7}{4-7}{FP0}
+\multigate{1-13}{4-13}{FP0}
+% annotations go here
+% wires go here
+\begin{pgfonlayer}{background}
+\qw{0-0}{0-16} \qw{1-0}{1-15} \qw{2-0}{2-15} \qw{3-0}{3-15} \qw{4-0}{4-15} \qw{5-0}{5-16} 
+\cw{1-15}{1-16} \cw{2-15}{2-16} \cw{3-15}{3-16} \cw{4-15}{4-16} 
+\qwx{4-4}{5-4} \qwx{4-10}{5-10} 
+\end{pgfonlayer}
+\end{tikzpicture}
+\caption{\label{fig:GroverSearch} GroverSearch}
+\end{figure*}
+
+\end{document}
