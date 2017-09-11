@@ -19,7 +19,7 @@ module SearchAlgorithms =
 
     let PhaseFlipX (x:int) (qs:Qubits) =
         let gateIdentifier = "PhaseFlipX{X="+x.ToString()+";Length="+qs.Length.ToString()+"}"
-        let gateName     = "FP"+ x.ToString()
+        let gateName = "FP"+ x.ToString()
         let gate = 
             Gate.Build(gateIdentifier, fun () ->
                 new Gate(
@@ -27,10 +27,10 @@ module SearchAlgorithms =
                     Help    = sprintf "Flip phase ofstate |%i>" x,
                     Mat     = (
                         let gateSize = 1 <<< qs.Length
-                        let mutable matrixEntriesList = [(x,x,-1.,0.)]
+                        let mutable matrixEntriesList = [(x,x,1.,0.)]
                         let iteratableList = List.filter(fun y -> y <> x)  [0 .. (gateSize - 1)]
                         for i in iteratableList do
-                            matrixEntriesList <- matrixEntriesList @ [(i,i,1.0,0.0)]
+                            matrixEntriesList <- matrixEntriesList @ [(i,i,-1.0,0.0)]
                         CSMat(gateSize, matrixEntriesList)),
                     Draw    = "\\multigate{#"+(qs.Length-1).ToString()+"}{" + gateName + "}"
                     )
@@ -61,23 +61,25 @@ module SearchAlgorithms =
                 ))
         gate.Run qs
 
-    let flipOverSuperpositionVector (qs:Qubits) = 
+    let flipAboutSuperpositionVector (qs:Qubits) = 
         H >< qs 
         PhaseFlipX 0 qs
         H >< qs
 
-    let FlipOverSuperpositionVector (qs:Qubits) = 
+    let FlipAboutSuperpositionVector (qs:Qubits) = 
         let numberOfQubitsForGate = qs.Length
         let name = "2|\\phi><\\phi|+I"
+        let gateIdentifier = "FlipAboutSuperPositionVector_" + numberOfQubitsForGate.ToString()
         let gate = 
-            Gate.Build("FlipOverSuperPositionVector_" + numberOfQubitsForGate.ToString(), fun () -> 
+            Gate.Build(gateIdentifier , fun () -> 
                 new Gate(
                     Qubits = numberOfQubitsForGate,
                     Name = name,
                     Help = "Flips the vector over the superposition vector",
                     Draw = sprintf "\\multigate{#%i}{%s}" (numberOfQubitsForGate-1) name,
-                    Op =  WrapOp (flipOverSuperpositionVector)
-                ))
+                    Op =  WrapOp (flipAboutSuperpositionVector)
+                )
+            )
         gate.Run qs
 
     let groverIteration (decisionGateFunction: GateFunctions.DecisionGateFunction) (qs:Qubits) =
@@ -85,7 +87,7 @@ module SearchAlgorithms =
         if qs.Length < numberOfQubitsForGate 
             then failwith (sprintf "GroverIteration needs at least %i qubits, but only %i are given" numberOfQubitsForGate (qs.Length))
         Oracle decisionGateFunction qs
-        FlipOverSuperpositionVector !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
+        FlipAboutSuperpositionVector !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
 
     let GroverIteration (decisionGateFunction: GateFunctions.DecisionGateFunction) (qs:Qubits) =
         let numberOfQubitsForGate = decisionGateFunction.NumberOfQubitsForGate() + 1
@@ -125,12 +127,9 @@ module SearchAlgorithms =
 
         let groverIteration (decisionGateFunction: GateFunctions.DecisionGateFunction) (qs:Qubits) =
             let numberOfQubitsForGate = decisionGateFunction.NumberOfQubitsForGate() + 1
-            if qs.Length < numberOfQubitsForGate 
-                then failwith (sprintf "GroverIteration needs at least %i qubits, but only %i are given" numberOfQubitsForGate (qs.Length))
+
             Oracle decisionGateFunction qs
-            H >< !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
-            PhaseFlipX 0 !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
-            H >< !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
+            FlipAboutSuperpositionVector !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
 
         let GroverIteration (decisionGateFunction: GateFunctions.DecisionGateFunction) (qs:Qubits) =
             let numberOfQubitsForGate = decisionGateFunction.NumberOfQubitsForGate() + 1
@@ -152,7 +151,7 @@ module SearchAlgorithms =
         
         // TODO maybe a usage of a prepare main measure sheme? can all algorithm fit this sheme?
 
-        let perpare (decisionGateFunction: GateFunctions.DecisionGateFunction)  (qs:Qubits) =
+        let prepare (decisionGateFunction: GateFunctions.DecisionGateFunction)  (qs:Qubits) =
             let indexOfAncillaQubit = decisionGateFunction.NumberOfQubitsForGate()
             X [qs.[indexOfAncillaQubit]] 
             H >< !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput @ [indexOfAncillaQubit])
@@ -169,7 +168,6 @@ module SearchAlgorithms =
 
         let measure (decisionGateFunction: GateFunctions.DecisionGateFunction) (qs:Qubits) =
             M >< !!(qs, decisionGateFunction.IndicesOfQubitsForFunctionInput)
-
 
         let groverSearch (decisionGateFunction: GateFunctions.DecisionGateFunction) (numberOfSolutions:int) (qs:Qubits) =
             let numberOfQubitsForGate = numberOfRequiredQubitsForGroverSearch decisionGateFunction
@@ -238,7 +236,7 @@ module SearchAlgorithms =
     module OzhigovSearch =
 
         let numberOfIterations N = 
-            int(round(System.Math.PI * sqrt(float N)/(2.*sqrt(2.)) )) // TODO check if it should be ceil or general round
+            int(round(System.Math.PI * sqrt(float N)/sqrt(8.) ))
 
         let W_i (f_i: GateFunctions.DecisionGateFunction) (qs:Qubits) = 
             H >< !!(qs, f_i.IndicesOfQubitsForFunctionInput)
@@ -336,14 +334,14 @@ module SearchAlgorithms =
 //        // basically a groverIteration
 //        let iteration11 (f_1: GateFunctions.DecisionGateFunction) (qs:Qubits) = 
 //            Oracle f_1 !!(qs, f_1.IndicesOfQubitsForGate() @ [ancillaQubitsForF1]
-//            FlipOverSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
+//            FlipAboutSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
 //
 //        let op11 (f_1: GateFunctions.DecisionGateFunction) (numberOfSolutions:int) (qs:Qubits) =
 //            GroverSearch.main f_1 numberOfSolutions !!(qs, f_1.IndicesOfQubitsForGate() @ [indexOfAncillaQubit]) 
 //
 //        let op13 (f_1: GateFunctions.DecisionGateFunction) (numberOfSolutions:int) (qs:Qubits) = 
 //            GroverSearch.main f_1 numberOfSolutions !!(qs, f_1.IndicesOfQubitsForGate() @ [indexOfAncillaQubit]) 
-//            FlipOverSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
+//            FlipAboutSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
 //            GroverSearch.main f_1 numberOfSolutions !!(qs, f_1.IndicesOfQubitsForGate() @ [indexOfAncillaQubit]) 
 //        let op8
 //            let circuit = Circuit.Compile GroverSearch.main f_2 1 !!(qs, f_2.IndicesOfQubitsForGate() @ [indexOfAncillaQubit]) 
@@ -356,8 +354,8 @@ module SearchAlgorithms =
 //        let iteration (f_1: GateFunctions.DecisionGateFunction) (f_2: GateFunctions.DecisionGateFunction) (qs:Qubits) = 
 //            Oracle f_1 !!(qs, f_1.IndicesOfQubitsForGate() @ [ancillaQubitsForF1]
 //            Oracle f_2 !!(qs, f_1.IndicesOfQubitsForGate() @ [ancillaQubitsForF2]
-//            FlipOverSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
-//            FlipOverSuperpositionVector !!(qs, f_2.IndicesOfQubitsForFunctionInput) 
+//            FlipAboutSuperpositionVector !!(qs, f_1.IndicesOfQubitsForFunctionInput) 
+//            FlipAboutSuperpositionVector !!(qs, f_2.IndicesOfQubitsForFunctionInput) 
 //
 //        let GroverStructuralSearch (f_1: GateFunctions.DecisionGateFunction) (f_2: GateFunctions.DecisionGateFunction) (qs:Qubits) = 
 //            let searchSpaceSize = (1 <<< f_1.NumberOfQubitsForFunctionInput())

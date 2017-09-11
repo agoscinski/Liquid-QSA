@@ -119,9 +119,9 @@ module SearchAlgorithmsSamples =
 
 
 #if INTERACTIVE
-do SearchAlgorithmsSamples.GroverSearchSamples.``benchmark grover search for each single solution in search space up to a max value`` 1 6 100 
+//do SearchAlgorithmsSamples.GroverSearchSamples.``benchmark grover search for each single solution in search space up to a max value`` 1 6 100 
 // Change detail level 0 most undetailed, 3 most detailed
 //do SearchAlgorithmsSamples.GroverSearchSamples.renderGroverSearchForSingleSolution 1 4 (Some 3)
 //do SearchAlgorithmsSamples.OzhigovSearchSamples.render 1 4 (Some 3)
-//do SearchAlgorithmsSamples.OzhigovSearchSamples.``benchmark Ozhigov search`` 0 6 100
+do SearchAlgorithmsSamples.OzhigovSearchSamples.``benchmark Ozhigov search`` 0 6 100
 #endif
